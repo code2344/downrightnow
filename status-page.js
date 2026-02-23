@@ -1,14 +1,3 @@
-const THEMES = [
-  { id: "midnight", label: "Midnight" },
-  { id: "sunset", label: "Sunset" },
-  { id: "forest", label: "Forest" },
-  { id: "ocean", label: "Ocean" },
-  { id: "lavender", label: "Lavender" },
-  { id: "rose", label: "Rose" },
-  { id: "slate", label: "Slate" },
-  { id: "neon", label: "Neon" }
-];
-
 const defaultConfig = {
   badge: "Status",
   title: "Service Update",
@@ -20,12 +9,9 @@ const defaultConfig = {
 const config = { ...defaultConfig, ...(window.STATUS_PAGE_CONFIG || {}) };
 
 const params = new URLSearchParams(window.location.search);
-const themeFromQuery = params.get("theme");
-const hasValidTheme = THEMES.some((theme) => theme.id === themeFromQuery);
-const activeTheme = hasValidTheme ? themeFromQuery : "midnight";
 const businessFromQuery = (params.get("business") || "").trim();
 
-document.body.classList.add(`theme-${activeTheme}`);
+document.body.classList.add("theme-midnight");
 
 document.getElementById("statusBadge").textContent = config.badge;
 document.getElementById("statusTitle").textContent = config.title;

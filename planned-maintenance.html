@@ -14,14 +14,13 @@
       <p id="statusMessage"></p>
       <p id="statusDetails" class="subtle"></p>
       <div class="controls">
-        <select id="themeSelector" aria-label="Theme selector"></select>
         <a class="button-link" href="master-preview.html">Open Master Preview</a>
       </div>
     </section>
   </main>
 
   <footer>
-    © <span id="year"></span> · <a href="https://scstudios.tech" target="_blank" rel="noopener">scstudios.tech</a>
+    <span id="footerContent"></span>
   </footer>
 
   <script>
@@ -29,7 +28,8 @@
       badge: "Scheduled",
       title: "Scheduled maintenance in progress",
       message: "This downtime is planned while we roll out reliability updates.",
-      details: "Expected completion time: soon. Thank you for understanding."
+      details: "Expected completion time: soon. Thank you for understanding.",
+      businessName: ""
     };
   </script>
   <script src="status-page.js"></script>

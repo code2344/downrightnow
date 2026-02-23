@@ -14,14 +14,13 @@
       <p id="statusMessage"></p>
       <p id="statusDetails" class="subtle"></p>
       <div class="controls">
-        <select id="themeSelector" aria-label="Theme selector"></select>
         <a class="button-link" href="master-preview.html">Open Master Preview</a>
       </div>
     </section>
   </main>
 
   <footer>
-    © <span id="year"></span> · <a href="https://scstudios.tech" target="_blank" rel="noopener">scstudios.tech</a>
+    <span id="footerContent"></span>
   </footer>
 
   <script>
@@ -29,7 +28,8 @@
       badge: "Upgrade",
       title: "System upgrade underway",
       message: "We’re deploying a major platform upgrade.",
-      details: "Access is temporarily paused while we complete the rollout."
+      details: "Access is temporarily paused while we complete the rollout.",
+      businessName: ""
     };
   </script>
   <script src="status-page.js"></script>

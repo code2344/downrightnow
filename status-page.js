@@ -13,7 +13,8 @@ const defaultConfig = {
   badge: "Status",
   title: "Service Update",
   message: "We are currently working on an update.",
-  details: "Please check back shortly."
+  details: "Please check back shortly.",
+  businessName: ""
 };
 
 const config = { ...defaultConfig, ...(window.STATUS_PAGE_CONFIG || {}) };
@@ -30,20 +31,22 @@ document.getElementById("statusTitle").textContent = config.title;
 document.getElementById("statusMessage").textContent = config.message;
 document.getElementById("statusDetails").textContent = config.details;
 
-const selector = document.getElementById("themeSelector");
-THEMES.forEach((theme) => {
-  const option = document.createElement("option");
-  option.value = theme.id;
-  option.textContent = theme.label;
-  option.selected = theme.id === activeTheme;
-  selector.appendChild(option);
-});
+const year = new Date().getFullYear();
+const footer = document.getElementById("footerContent");
 
-selector.addEventListener("change", (event) => {
-  const nextTheme = event.target.value;
-  const nextParams = new URLSearchParams(window.location.search);
-  nextParams.set("theme", nextTheme);
-  window.location.search = nextParams.toString();
-});
+function escapeHtml(value) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
-document.getElementById("year").textContent = new Date().getFullYear();
+const businessName = (config.businessName || "").trim();
+
+if (businessName) {
+  footer.innerHTML = `© ${year} ${escapeHtml(businessName)} | Site under development by <a href="https://scstudios.tech" target="_blank" rel="noopener">SuperCode Studios</a>`;
+} else {
+  footer.innerHTML = `© ${year} <a href="https://scstudios.tech" target="_blank" rel="noopener">scstudios.tech</a>`;
+}

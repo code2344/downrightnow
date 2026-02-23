@@ -23,6 +23,7 @@ const params = new URLSearchParams(window.location.search);
 const themeFromQuery = params.get("theme");
 const hasValidTheme = THEMES.some((theme) => theme.id === themeFromQuery);
 const activeTheme = hasValidTheme ? themeFromQuery : "midnight";
+const businessFromQuery = (params.get("business") || "").trim();
 
 document.body.classList.add(`theme-${activeTheme}`);
 
@@ -43,7 +44,7 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
-const businessName = (config.businessName || "").trim();
+const businessName = businessFromQuery || (config.businessName || "").trim();
 
 if (businessName) {
   footer.innerHTML = `© ${year} ${escapeHtml(businessName)} | Site under development by <a href="https://scstudios.tech" target="_blank" rel="noopener">SuperCode Studios</a>`;

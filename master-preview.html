@@ -52,6 +52,7 @@
     }
 
     select,
+    input,
     button,
     a {
       border: 0;
@@ -64,6 +65,12 @@
     select {
       background: #f8fafc;
       color: #111827;
+    }
+
+    input {
+      background: #f8fafc;
+      color: #111827;
+      min-width: 220px;
     }
 
     button,
@@ -105,6 +112,19 @@
       border-color: #22d3ee;
       color: #67e8f9;
     }
+
+    .share-row {
+      margin-top: 0.6rem;
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    #shareUrl {
+      flex: 1;
+      min-width: 300px;
+    }
   </style>
 </head>
 <body>
@@ -115,8 +135,14 @@
       <div class="controls">
         <select id="pageSelector" aria-label="Page selector"></select>
         <select id="themeSelector" aria-label="Theme selector"></select>
+        <input id="businessInput" type="text" placeholder="Optional custom business name">
         <button id="previewButton" type="button">Preview Selection</button>
         <a id="openLink" class="launch" href="#" target="_blank" rel="noopener">Open in New Tab</a>
+        <a id="exportLink" class="launch" href="#" target="_blank" rel="noopener">Export Link</a>
+      </div>
+      <div class="share-row">
+        <input id="shareUrl" type="text" readonly aria-label="Share URL">
+        <button id="copyShareButton" type="button">Copy Link</button>
       </div>
     </section>
 
@@ -155,6 +181,10 @@
     const previewFrame = document.getElementById('previewFrame');
     const previewButton = document.getElementById('previewButton');
     const openLink = document.getElementById('openLink');
+    const exportLink = document.getElementById('exportLink');
+    const businessInput = document.getElementById('businessInput');
+    const shareUrl = document.getElementById('shareUrl');
+    const copyShareButton = document.getElementById('copyShareButton');
     const matrix = document.getElementById('matrix');
 
     pages.forEach((page) => {
@@ -171,27 +201,69 @@
       themeSelector.appendChild(option);
     });
 
-    function getUrl(page, theme) {
-      return `${page}?theme=${theme}`;
+    function buildParams(theme, business) {
+      const params = new URLSearchParams();
+      params.set('theme', theme);
+      const trimmedBusiness = business.trim();
+      if (trimmedBusiness) {
+        params.set('business', trimmedBusiness);
+      }
+      return params;
+    }
+
+    function getPreviewUrl(page, theme, business) {
+      return `${page}?${buildParams(theme, business).toString()}`;
+    }
+
+    function getExportUrl(page, theme, business) {
+      const params = new URLSearchParams();
+      params.set('page', page);
+      params.set('theme', theme);
+      const trimmedBusiness = business.trim();
+      if (trimmedBusiness) {
+        params.set('business', trimmedBusiness);
+      }
+      return `export-index.html?${params.toString()}`;
     }
 
     function updatePreview() {
       const page = pageSelector.value;
       const theme = themeSelector.value;
-      const url = getUrl(page, theme);
-      previewFrame.src = url;
-      openLink.href = url;
+      const business = businessInput.value;
+      const previewUrl = getPreviewUrl(page, theme, business);
+      const exportUrl = getExportUrl(page, theme, business);
+      previewFrame.src = previewUrl;
+      openLink.href = previewUrl;
+      exportLink.href = exportUrl;
+      shareUrl.value = new URL(exportUrl, window.location.href).toString();
     }
 
     previewButton.addEventListener('click', updatePreview);
     pageSelector.addEventListener('change', updatePreview);
     themeSelector.addEventListener('change', updatePreview);
+    businessInput.addEventListener('input', updatePreview);
+
+    copyShareButton.addEventListener('click', async () => {
+      if (!shareUrl.value) {
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(shareUrl.value);
+        copyShareButton.textContent = 'Copied';
+        setTimeout(() => {
+          copyShareButton.textContent = 'Copy Link';
+        }, 1200);
+      } catch (error) {
+        shareUrl.select();
+      }
+    });
 
     pages.forEach((page) => {
       themes.forEach((theme) => {
         const link = document.createElement('a');
         link.className = 'chip';
-        link.href = getUrl(page.id, theme.id);
+        link.href = getPreviewUrl(page.id, theme.id, '');
         link.target = '_blank';
         link.rel = 'noopener';
         link.textContent = `${page.label} · ${theme.label}`;

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Export Status Index</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      background: #0b1020;
+      color: #f8fafc;
+      text-align: center;
+    }
+
+    .panel {
+      width: min(720px, 100%);
+      background: #111827;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      padding: 1.2rem;
+    }
+
+    h1 {
+      margin-bottom: 0.6rem;
+      font-size: 1.5rem;
+    }
+
+    p {
+      color: #cbd5e1;
+      margin-bottom: 0.8rem;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-top: 0.8rem;
+    }
+
+    a,
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 0.55rem 0.8rem;
+      background: #22d3ee;
+      color: #042f2e;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    .muted {
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <h1>Exporting index.html</h1>
+    <p id="summary"></p>
+    <p class="muted">The file downloads automatically. If it does not, use Download Again.</p>
+    <div class="actions">
+      <button id="downloadAgain" type="button">Download Again</button>
+      <a id="previewLink" href="#" target="_blank" rel="noopener">Open Preview</a>
+      <a href="master-preview.html">Back to Master Preview</a>
+    </div>
+  </main>
+
+  <script>
+    const statusPages = {
+      'newthingscomingsoon.html': {
+        label: 'Coming Soon',
+        badge: 'Coming Soon',
+        title: 'New things are coming soon',
+        message: 'We’re building something exciting behind the scenes.',
+        details: 'Please check back soon for the full launch.'
+      },
+      'down-for-maintenance.html': {
+        label: 'Down for Maintenance',
+        badge: 'Maintenance',
+        title: 'We’re down for maintenance',
+        message: 'Our team is applying updates and improvements right now.',
+        details: 'Service should return shortly. Thanks for your patience.'
+      },
+      'service-unavailable.html': {
+        label: 'Service Unavailable',
+        badge: 'Unavailable',
+        title: 'Service temporarily unavailable',
+        message: 'We’re experiencing a temporary disruption.',
+        details: 'Our engineers are working to restore normal access as soon as possible.'
+      },
+      'planned-maintenance.html': {
+        label: 'Planned Maintenance',
+        badge: 'Scheduled',
+        title: 'Scheduled maintenance in progress',
+        message: 'This downtime is planned while we roll out reliability updates.',
+        details: 'Expected completion time: soon. Thank you for understanding.'
+      },
+      'system-upgrade.html': {
+        label: 'System Upgrade',
+        badge: 'Upgrade',
+        title: 'System upgrade underway',
+        message: 'We’re deploying a major platform upgrade.',
+        details: 'Access is temporarily paused while we complete the rollout.'
+      }
+    };
+
+    const themes = {
+      midnight: {
+        bg: 'radial-gradient(circle at top right, #1e293b, #020617 70%)',
+        text: '#f8fafc',
+        muted: '#cbd5e1',
+        panel: 'rgba(15, 23, 42, 0.55)',
+        accent: '#7dd3fc',
+        buttonText: '#082f49'
+      },
+      sunset: {
+        bg: 'linear-gradient(135deg, #7c2d12, #ea580c, #facc15)',
+        text: '#fff7ed',
+        muted: '#ffedd5',
+        panel: 'rgba(124, 45, 18, 0.4)',
+        accent: '#fde68a',
+        buttonText: '#7c2d12'
+      },
+      forest: {
+        bg: 'linear-gradient(135deg, #052e16, #166534, #4d7c0f)',
+        text: '#f0fdf4',
+        muted: '#dcfce7',
+        panel: 'rgba(5, 46, 22, 0.45)',
+        accent: '#86efac',
+        buttonText: '#14532d'
+      },
+      ocean: {
+        bg: 'linear-gradient(135deg, #0c4a6e, #0369a1, #0891b2)',
+        text: '#ecfeff',
+        muted: '#cffafe',
+        panel: 'rgba(8, 47, 73, 0.42)',
+        accent: '#67e8f9',
+        buttonText: '#164e63'
+      },
+      lavender: {
+        bg: 'linear-gradient(135deg, #4c1d95, #7e22ce, #c084fc)',
+        text: '#faf5ff',
+        muted: '#f3e8ff',
+        panel: 'rgba(76, 29, 149, 0.4)',
+        accent: '#ddd6fe',
+        buttonText: '#4c1d95'
+      },
+      rose: {
+        bg: 'linear-gradient(135deg, #881337, #be123c, #fb7185)',
+        text: '#fff1f2',
+        muted: '#ffe4e6',
+        panel: 'rgba(136, 19, 55, 0.42)',
+        accent: '#fecdd3',
+        buttonText: '#881337'
+      },
+      slate: {
+        bg: 'linear-gradient(135deg, #111827, #374151, #6b7280)',
+        text: '#f9fafb',
+        muted: '#e5e7eb',
+        panel: 'rgba(17, 24, 39, 0.48)',
+        accent: '#d1d5db',
+        buttonText: '#111827'
+      },
+      neon: {
+        bg: 'linear-gradient(135deg, #030712, #1f2937, #111827)',
+        text: '#ecfeff',
+        muted: '#a5f3fc',
+        panel: 'rgba(17, 24, 39, 0.58)',
+        accent: '#22d3ee',
+        buttonText: '#042f2e'
+      }
+    };
+
+    const summary = document.getElementById('summary');
+    const previewLink = document.getElementById('previewLink');
+    const downloadAgain = document.getElementById('downloadAgain');
+    const params = new URLSearchParams(window.location.search);
+
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    const selectedPage = params.get('page') || 'newthingscomingsoon.html';
+    const selectedTheme = params.get('theme') || 'midnight';
+    const selectedBusiness = (params.get('business') || '').trim();
+
+    const page = statusPages[selectedPage] || statusPages['newthingscomingsoon.html'];
+    const theme = themes[selectedTheme] || themes.midnight;
+    const year = new Date().getFullYear();
+
+    function buildFooterHtml() {
+      if (selectedBusiness) {
+        return `© ${year} ${escapeHtml(selectedBusiness)} | Site under development by <a href="https://scstudios.tech" target="_blank" rel="noopener">SuperCode Studios</a>`;
+      }
+
+      return `© ${year} <a href="https://scstudios.tech" target="_blank" rel="noopener">scstudios.tech</a>`;
+    }
+
+    function buildExportHtml() {
+      return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(page.label)}</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: ${theme.bg};
+      color: ${theme.text};
+      text-align: center;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    .container {
+      width: min(840px, 100%);
+      background: ${theme.panel};
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 2rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .badge {
+      display: inline-block;
+      margin-bottom: 1rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      margin-bottom: 0.8rem;
+    }
+
+    p {
+      font-size: clamp(1rem, 1.4vw, 1.15rem);
+      color: ${theme.muted};
+    }
+
+    .subtle {
+      margin-top: 0.7rem;
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    footer {
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    footer a {
+      color: ${theme.accent};
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="container">
+      <span class="badge">${escapeHtml(page.badge)}</span>
+      <h1>${escapeHtml(page.title)}</h1>
+      <p>${escapeHtml(page.message)}</p>
+      <p class="subtle">${escapeHtml(page.details)}</p>
+    </section>
+  </main>
+
+  <footer>
+    ${buildFooterHtml()}
+  </footer>
+</body>
+</html>
+`;
+    }
+
+    function triggerDownload() {
+      const html = buildExportHtml();
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'index.html';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    const previewParams = new URLSearchParams();
+    previewParams.set('theme', selectedTheme);
+    if (selectedBusiness) {
+      previewParams.set('business', selectedBusiness);
+    }
+
+    previewLink.href = `${selectedPage}?${previewParams.toString()}`;
+    summary.textContent = `Selected: ${page.label} · ${selectedTheme}${selectedBusiness ? ` · ${selectedBusiness}` : ''}`;
+
+    downloadAgain.addEventListener('click', triggerDownload);
+    triggerDownload();
+  </script>
+</body>
+</html>

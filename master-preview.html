@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Status Page Master Preview</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #0b1020;
+      color: #f8fafc;
+      padding: 1.5rem;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .panel {
+      background: #111827;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      padding: 1rem;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #cbd5e1;
+      margin-bottom: 0.6rem;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+      margin-top: 0.6rem;
+    }
+
+    select,
+    button,
+    a {
+      border: 0;
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+
+    select {
+      background: #f8fafc;
+      color: #111827;
+    }
+
+    button,
+    .launch {
+      background: #22d3ee;
+      color: #042f2e;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    iframe {
+      width: 100%;
+      min-height: 62vh;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      background: #020617;
+    }
+
+    .matrix {
+      display: grid;
+      gap: 0.6rem;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .chip {
+      display: inline-flex;
+      width: 100%;
+      justify-content: center;
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: #e2e8f0;
+      padding: 0.45rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.86rem;
+    }
+
+    .chip:hover {
+      border-color: #22d3ee;
+      color: #67e8f9;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="panel">
+      <h1>Status Page Master Preview</h1>
+      <p>Preview every page variation with all 8 themes.</p>
+      <div class="controls">
+        <select id="pageSelector" aria-label="Page selector"></select>
+        <select id="themeSelector" aria-label="Theme selector"></select>
+        <button id="previewButton" type="button">Preview Selection</button>
+        <a id="openLink" class="launch" href="#" target="_blank" rel="noopener">Open in New Tab</a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <iframe id="previewFrame" title="Status page preview"></iframe>
+    </section>
+
+    <section class="panel">
+      <p>All combinations</p>
+      <div id="matrix" class="matrix"></div>
+    </section>
+  </div>
+
+  <script>
+    const pages = [
+      { id: 'newthingscomingsoon.html', label: 'Coming Soon' },
+      { id: 'down-for-maintenance.html', label: 'Down for Maintenance' },
+      { id: 'service-unavailable.html', label: 'Service Unavailable' },
+      { id: 'planned-maintenance.html', label: 'Planned Maintenance' },
+      { id: 'system-upgrade.html', label: 'System Upgrade' }
+    ];
+
+    const themes = [
+      { id: 'midnight', label: 'Midnight' },
+      { id: 'sunset', label: 'Sunset' },
+      { id: 'forest', label: 'Forest' },
+      { id: 'ocean', label: 'Ocean' },
+      { id: 'lavender', label: 'Lavender' },
+      { id: 'rose', label: 'Rose' },
+      { id: 'slate', label: 'Slate' },
+      { id: 'neon', label: 'Neon' }
+    ];
+
+    const pageSelector = document.getElementById('pageSelector');
+    const themeSelector = document.getElementById('themeSelector');
+    const previewFrame = document.getElementById('previewFrame');
+    const previewButton = document.getElementById('previewButton');
+    const openLink = document.getElementById('openLink');
+    const matrix = document.getElementById('matrix');
+
+    pages.forEach((page) => {
+      const option = document.createElement('option');
+      option.value = page.id;
+      option.textContent = page.label;
+      pageSelector.appendChild(option);
+    });
+
+    themes.forEach((theme) => {
+      const option = document.createElement('option');
+      option.value = theme.id;
+      option.textContent = theme.label;
+      themeSelector.appendChild(option);
+    });
+
+    function getUrl(page, theme) {
+      return `${page}?theme=${theme}`;
+    }
+
+    function updatePreview() {
+      const page = pageSelector.value;
+      const theme = themeSelector.value;
+      const url = getUrl(page, theme);
+      previewFrame.src = url;
+      openLink.href = url;
+    }
+
+    previewButton.addEventListener('click', updatePreview);
+    pageSelector.addEventListener('change', updatePreview);
+    themeSelector.addEventListener('change', updatePreview);
+
+    pages.forEach((page) => {
+      themes.forEach((theme) => {
+        const link = document.createElement('a');
+        link.className = 'chip';
+        link.href = getUrl(page.id, theme.id);
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.textContent = `${page.label} · ${theme.label}`;
+        matrix.appendChild(link);
+      });
+    });
+
+    pageSelector.value = pages[0].id;
+    themeSelector.value = themes[0].id;
+    updatePreview();
+  </script>
+</body>
+</html>
